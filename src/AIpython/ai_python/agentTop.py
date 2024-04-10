@@ -19,23 +19,27 @@ class Rob_top_layer(Environment):
     def __init__(self, middle, timeout, locations):
         """middle is the middle layer
         timeout is the number of steps the middle layer goes before giving up
-        locations is a loc:pos dictionary 
+        locations is a loc:pos dictionary
             where loc is a named location, and pos is an (x,y) position.
         """
         self.middle = middle
         self.timeout = timeout  # number of steps before the middle layer should give up
         self.locations = locations
         
-    def do(self,plan):
+    def do(self, plan):
         """carry out actions.
         actions is of the form {'visit':list_of_locations}
         It visits the locations in turn.
         """
-        to_do = plan['visit']
-        for loc in to_do:
-            position = self.locations[loc]
-            arrived = self.middle.do({'go_to':position, 'timeout':self.timeout})
-            self.display(1,"Arrived at",loc,arrived)
+        if 'visit' in plan:  # Vérifie si la clé 'visit' est présente dans le plan
+            to_do = plan['visit']  # Défini to_do seulement si 'visit' est présent dans le plan
+            while True:
+                for loc in to_do:
+                    position = self.locations[loc]
+                    arrived = self.middle.do({'go_to': position, 'timeout': self.timeout})
+                    self.display(1, "Arrived at", loc, arrived)
+        else:
+            print("No 'visit' key found in the plan.")
 
 
 
