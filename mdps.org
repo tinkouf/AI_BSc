@@ -1,0 +1,256 @@
+#+TITLE: Markov Decision Processes
+#+AUTHOR: Christos Dimitrakakis
+#+EMAIL:christos.dimitrakakis@unine.ch
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_HEADER: \usepackage{algorithm,algorithmic}
+#+LaTeX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{amssymb}
+#+LaTeX_HEADER: \usepackage{isomath}
+#+LaTeX_HEADER: \usepackage{tikzsymbols}
+#+LaTeX_HEADER: \newcommand \E {\mathop{\mbox{\ensuremath{\mathbb{E}}}}\nolimits}
+#+LaTeX_HEADER: \newcommand \Var {\mathop{\mbox{\ensuremath{\mathbb{V}}}}\nolimits}
+#+LaTeX_HEADER: \newcommand \Bias {\mathop{\mbox{\ensuremath{\mathbb{B}}}}\nolimits}
+#+LaTeX_HEADER: \newcommand\ind[1]{\mathop{\mbox{\ensuremath{\mathbb{I}}}}\left\{#1\right\}}
+#+LaTeX_HEADER: \renewcommand \Pr {\mathop{\mbox{\ensuremath{\mathbb{P}}}}\nolimits}
+#+LaTeX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max}
+#+LaTeX_HEADER: \DeclareMathOperator*{\argmin}{arg\,min}
+#+LaTeX_HEADER: \DeclareMathOperator*{\sgn}{sgn}
+#+LaTeX_HEADER: \newcommand \defn {\mathrel{\triangleq}}
+#+LaTeX_HEADER: \newcommand \Reals {\mathbb{R}}
+#+LaTeX_HEADER: \newcommand \Param {\Theta}
+#+LaTeX_HEADER: \newcommand \param {\theta}
+#+LaTeX_HEADER: \newcommand \vparam {\vectorsym{\theta}}
+#+LaTeX_HEADER: \newcommand \mparam {\matrixsym{\Theta}}
+#+LaTeX_HEADER: \newcommand \bW {\matrixsym{W}}
+#+LaTeX_HEADER: \newcommand \bw {\vectorsym{w}}
+#+LaTeX_HEADER: \newcommand \wi {\vectorsym{w}_i}
+#+LaTeX_HEADER: \newcommand \wij {w_{i,j}}
+#+LaTeX_HEADER: \newcommand \bA {\matrixsym{A}}
+#+LaTeX_HEADER: \newcommand \ai {\vectorsym{a}_i}
+#+LaTeX_HEADER: \newcommand \aij {a_{i,j}}
+#+LaTeX_HEADER: \newcommand \bx {\vectorsym{x}}
+#+LaTeX_HEADER: \newcommand \callcset[2] {\left\{#1 ~\middle|~ #2 \right\}}
+#+LaTeX_HEADER: \newcommand \pol {\pi}
+#+LaTeX_HEADER: \newcommand \Pols {\Pi}
+#+LaTeX_HEADER: \newcommand \mdp {\mu}
+#+LaTeX_HEADER: \newcommand \MDPs {\mathcal{M}}
+#+LaTeX_HEADER: \newcommand \bel {\beta}
+#+LaTeX_HEADER: \newcommand \Bels {\mathcal{B}}
+#+LaTeX_HEADER: \newcommand \Unif {\textrm{Unif}}
+#+LaTeX_HEADER: \newcommand \Ber {\textrm{Bernoulli}}
+#+LaTeX_HEADER: \newcommand \Mult {\textrm{Mult}}
+#+LaTeX_HEADER: \newcommand \Beta {\textrm{Beta}}
+#+LaTeX_HEADER: \newcommand \Dir {\textrm{Dir}}
+#+LaTeX_HEADER: \newcommand \Normal {\textrm{Normal}}
+#+LaTeX_HEADER: \newcommand \Simplex {\mathbb{\Delta}}
+#+LaTeX_HEADER: \newcommand \pn {\param^{(n)}}
+#+LaTeX_HEADER: \newcommand \pnn {\param^{(n+1)}}
+#+LaTeX_HEADER: \newcommand \pnp {\param^{(n-1)}}
+#+LaTeX_HEADER: \newcommand{\indep}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}
+#+LaTeX_HEADER: \usetikzlibrary{shapes.geometric}
+#+LaTeX_HEADER: \usetikzlibrary{arrows.meta, positioning, quotes}
+#+LaTeX_HEADER: \tikzstyle{utility}=[diamond,draw=black,draw=blue!50,fill=blue!10,inner sep=0mm, minimum size=8mm]
+#+LaTeX_HEADER: \tikzstyle{select}=[rectangle,draw=black,draw=blue!50,fill=blue!10,inner sep=0mm, minimum size=6mm]
+#+LaTeX_HEADER: \tikzstyle{hidden}=[dashed,draw=black,fill=red!10]
+#+LaTeX_HEADER: \tikzstyle{RV}=[circle,draw=black,draw=blue!50,fill=blue!10,inner sep=0mm, minimum size=6mm]
+#+LaTeX_HEADER: \tikzstyle{con}=[rectangle,draw=white,fill=gray,inner sep=0mm, minimum size=6mm]
+#+LaTeX_CLASS_OPTIONS: [smaller]
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+#+TAGS: activity advanced definition exercise homework project example theory code
+#+OPTIONS:   H:3
+* Markov decision processes
+#+TOC: headlines [currentsection]
+** The Markov process
+*** Markov processes
+[[./figures/Snakes_and_Ladders.jpeg]]
+*** Markov Process
+A sequence of random variables 
+$s_1, s_2, \ldots, s_t$ is a *Markov process* if the nest variable $s_{t+1}$ only depends on the current value $s_t$
+\[
+P(s_{t+1} \mid s_{t}, \ldots, s_1) = P(s_{t+1} \mid s_{t}) \qquad \forall t
+\]
+#+BEAMER: \pause
+- The variable $s_t \in S$ is the current *state* of the process.
+- For finite $S$, the matrix $p_{i,j} \defn P(s_t = j \mid s_{t-1} = i)$ is called the *transition matrix*.
+#+BEAMER: \pause
+**** Bayesian network
+It is sometimes called  *Markov chain* because of the structure formed by the RVs:
+\begin{tikzpicture}
+  \node[RV] at (0,0) (stp) {$s_{t-1}$};
+  \node[RV] at (2,0) (st) {$s_t$};
+  \node[RV] at (4,0) (stn) {$s_{t+1}$};
+  \draw[->] (stp) -- (st);
+  \draw[->] (st) -- (stn);
+\end{tikzpicture}
+#+BEAMER: \pause
+**** Snakes and ladders
+- What is the state?
+- What is the transition matrix?
+
+*** Markov Decision Process
+**** Variables                                                        :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.4
+     :END:
+- The *state* $s_t \in S$.
+- The *action* $a_t \in A$.
+- The *reward* $r_t \in \Reals$.
+#+BEAMER: \pause
+**** Bayesian network                                                 :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.6
+     :END:
+\begin{tikzpicture}
+  \node[RV] at (0,0) (stp) {$s_{t-1}$};
+  \node[RV] at (2,0) (st) {$s_t$};
+  \node[RV] at (4,0) (stn) {$s_{t+1}$};
+  \node[select] at (0,2) (atp) {$a_{t-1}$};
+  \node[select] at (2,2) (at) {$a_t$};
+  \node[utility] at (2,1) (rtp) {$r_{t}$};
+  \node[utility] at (4,1) (rt) {$r_{t+1}$};
+  \draw[->] (atp) -- (st);
+  \draw[->] (atp) -- (rtp);
+  \draw[->] (stp) -- (rtp);
+  \draw[->] (at) -- (rt);
+  \draw[->] (st) -- (rt);
+  \draw[->] (at) -- (stn);
+  \draw[->] (stp) -- (st);
+  \draw[->] (st) -- (stn);
+\end{tikzpicture}
+
+**** Markov Decision Process :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+A Markov decision process $\mdp$ on $(S, A)$ has the property that for any sequence of actions $a_1, \ldots$
+\begin{align*}
+P_\mdp(s_{t+1} \mid s_t, a_t, r_{t}, s_{t-1}, a_{t-1}, \ldots) = P_\mdp(s_{t+1} \mid s_t, a_t)
+\\
+P_\mdp(r_{t+1} \mid s_t, a_t, r_{t}, s_{t-1}, a_{t-1}, \ldots) = P_\mdp(r_{t+1} \mid s_t, a_t)
+\end{align*}
+The goal in a *finite-horizon* MDP is to maximise the \(T\)-horizon utility:
+\[
+U = \sum_{t=1}^T r_t
+\]
+*** Policies in Markov decision processes
+
+**** Variables                                                        :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.4
+     :END:
+- The *policy* $\pol$
+- The *state* $s_t \in S$.
+- The *action* $a_t \in A$.
+- The *reward* $r_t \in \Reals$.
+#+BEAMER: \pause
+**** Bayesian network                                                 :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.6
+     :END:
+\begin{tikzpicture}
+  \node[select] at (2,3) (pol) {$\pol$};
+  \node[RV] at (0,0) (stp) {$s_{t-1}$};
+  \node[RV] at (2,0) (st) {$s_t$};
+  \node[RV] at (4,0) (stn) {$s_{t+1}$};
+  \node[RV] at (0,2) (atp) {$a_{t-1}$};
+  \node[RV] at (2,2) (at) {$a_t$};
+  \node[utility] at (2,1) (rtp) {$r_{t}$};
+  \node[utility] at (4,1) (rt) {$r_{t+1}$};
+  \draw[->] (pol) -- (atp);
+  \draw[->] (pol) -- (at);
+  \draw[->] (atp) -- (st);
+  \draw[->] (st) to [bend right = 45] (at);
+  \draw[->] (stp) to [bend right = 45] (atp);
+  \draw[->] (atp) -- (rtp);
+  \draw[->] (stp) -- (rtp);
+  \draw[->] (at) -- (rt);
+  \draw[->] (st) -- (rt);
+  \draw[->] (at) -- (stn);
+  \draw[->] (stp) -- (st);
+  \draw[->] (st) -- (stn);
+\end{tikzpicture}
+
+**** Markov Policy                                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+A Markov policy takes an action $a$ at time $t$ with probability 
+\[
+\pol(a_t = a \mid s_t = s)
+\]
+**** The expected utility of a policy
+\[
+\E_\pol[U] = \sum_{t=1}^T \E_\pol[r_t]
+\]
+ 
+* Backwards induction
+
+** Utility and value functions
+
+*** Value function
+- The utility from step $t$ is $U_t \defn \sum_{k=t}^T r_k$
+**** The state value function
+This is the expected utility obtained by following a *policy $\pol$* starting from some *state $s$*.
+\[
+V^\pol_t(s) \defn \E_\pol(U_t \mid s_t = s)
+\]
+**** The state-action value function
+This is the expected utility obtained by following a policy $\pol$ starting from some state $s$ and *playing action $a$*
+\[
+Q^\pol_t(s, a) \defn \E_\pol(U_t \mid s_t = s, a_t = a)
+\]
+**** The optimal value function
+There is some policy $\pol^*$ satisfying
+\begin{align*}
+V^*(s) &\defn V^{\pol^*}(s) \geq V^\pol(s) \qquad \forall \pol, s
+\\
+Q^*(s, a) &\defn Q^{\pol^*}(s, a) \geq Q^\pol(s, a) \qquad \forall \pol, s, a
+\end{align*}
+
+
+*** The expected utility recursion
+Value functions satisfy the following recursion
+\begin{align*}
+V^\pol_t(s_t) 
+&= \E_\pol(U_t \mid s_t)\\
+&= \E_\pol\left[\sum_{t=1}^T r_t \middle| s_t\right]\\
+&= \E_\pol[r_t \mid s_t] + \E_\pol\left[\sum_{k=t+2}^T r_k \middle| s_t  \right]\\
+&= \E_\pol[r_t \mid s_t] + \E_\pol\left[U_{t+1}| s_t \right]\\
+&= \E_\pol[r_t \mid s_t] + \sum_{s_{t+1} \in S} \Pr_\pol(s_{t+1} \mid s_t) \E_\pol\left[U_{t+1}| s_{t+1} \right]\\
+&= \E_\pol[r_t \mid s_t] +  \sum_a \pol(a \mid s_t) \sum_{s_{t+1} \in S} P_\mdp(s_{t+1} \mid s_t, a) V^\pol_{t+1}(s_{t+1}).
+\end{align*}
+**** Exercise
+Prove that 
+\[
+Q^\pol_t(s, a) = r(s, a) + \sum_{s' \in S} P_\mdp(s' \mid s, a) \sum_{a' \in A} Q^\pol_{t+1}(s', a') \pol(a_{t+1} = a' \mid s_{t+1} = s')
+\]
+
+*** Backwards induction
+**** On the state value function
+To find the value function of the optimal policy, we can perform the following recursion, after setting $V^*_T(s) = \max_a r(s,a)$ for all $s$.
+\[
+V^*_t(s) 
+=
+\max_a r(s,a)  + \sum_{s' \in S} P_\mdp(s' \mid s, a) V^*_{t+1}(s'),
+\]
+where the optimal action at $s, t$ is $\argmax_a r(s,a)  + \sum_{s' \in S} P_\mdp(s' \mid s, a) V^*_{t+1}(s')$.
+**** On the state-action value function
+Alternatively, we can write this in terms of the Q-value function, where we set
+$Q^*_T(s,a) = r(s,a)$ and then recurse:
+\[
+Q^*_t(s, a) 
+=
+ r(s,a)  + \sum_{s' \in S} P_\mdp(s' \mid s, a) \max_{a'} Q^*_{t+1} Q(s', a').
+\]
+Here the optimal action at step $t$ is just $\argmax_a Q^*_t(s,a)$.
+
+* Examples
+** Toy examples
+*** Grid world
+*** Chain
+*** Wumpus world
+** Applications
+*** CPU schedulding
+
